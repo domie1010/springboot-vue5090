@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.GongzuofenpeiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.gongzuofenpei_uuid_number as gongzuofenpeiUuidNumber
+        ,a.gongzuofenpei_name as gongzuofenpeiName
+        ,a.gongzuofenpei_photo as gongzuofenpeiPhoto
+        ,a.shequrenyuan_id as shequrenyuanId
+        ,a.gongzuofenpei_types as gongzuofenpeiTypes
+        ,a.gongzuofenpei_time as gongzuofenpeiTime
+        ,a.gongzuofenpei_content as gongzuofenpeiContent
+        ,a.gongzuofenpei_delete as gongzuofenpeiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.GongzuofenpeiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,shequrenyuan.shequrenyuan_name as shequrenyuanName
+        ,shequrenyuan.sex_types as sexTypes
+        ,shequrenyuan.shequrenyuan_photo as shequrenyuanPhoto
+        ,shequrenyuan.shequrenyuan_phone as shequrenyuanPhone
+        ,shequrenyuan.shequrenyuan_email as shequrenyuanEmail
+        ,shequrenyuan.shequrenyuan_address as shequrenyuanAddress
+        ,shequrenyuan.shequrenyuan_delete as shequrenyuanDelete
+
+        FROM gongzuofenpei  a
+        left JOIN shequrenyuan shequrenyuan ON a.shequrenyuan_id = shequrenyuan.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.gongzuofenpeiUuidNumber != '' and params.gongzuofenpeiUuidNumber != null and params.gongzuofenpeiUuidNumber != 'null' ">
+                and a.gongzuofenpei_uuid_number like CONCAT('%',#{params.gongzuofenpeiUuidNumber},'%')
+            </if>
+            <if test=" params.gongzuofenpeiName != '' and params.gongzuofenpeiName != null and params.gongzuofenpeiName != 'null' ">
+                and a.gongzuofenpei_name like CONCAT('%',#{params.gongzuofenpeiName},'%')
+            </if>
+            <if test="params.shequrenyuanId != null and params.shequrenyuanId != ''">
+                and (
+                    a.shequrenyuan_id = #{params.shequrenyuanId}
+                )
+            </if>
+            <if test="params.gongzuofenpeiTypes != null and params.gongzuofenpeiTypes != ''">
+                and a.gongzuofenpei_types = #{params.gongzuofenpeiTypes}
+            </if>
+            <if test=" params.gongzuofenpeiTimeStart != '' and params.gongzuofenpeiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.gongzuofenpei_time) >= UNIX_TIMESTAMP(#{params.gongzuofenpeiTimeStart}) ]]>
+            </if>
+            <if test=" params.gongzuofenpeiTimeEnd != '' and params.gongzuofenpeiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.gongzuofenpei_time) <= UNIX_TIMESTAMP(#{params.gongzuofenpeiTimeEnd}) ]]>
+            </if>
+            <if test=" params.gongzuofenpeiContent != '' and params.gongzuofenpeiContent != null and params.gongzuofenpeiContent != 'null' ">
+                and a.gongzuofenpei_content like CONCAT('%',#{params.gongzuofenpeiContent},'%')
+            </if>
+            <if test="params.gongzuofenpeiDeleteStart != null and params.gongzuofenpeiDeleteStart != ''">
+                <![CDATA[  and a.gongzuofenpei_delete >= #{params.gongzuofenpeiDeleteStart}   ]]>
+            </if>
+            <if test="params.gongzuofenpeiDeleteEnd != null and params.gongzuofenpeiDeleteEnd != ''">
+                <![CDATA[  and a.gongzuofenpei_delete <= #{params.gongzuofenpeiDeleteEnd}   ]]>
+            </if>
+             <if test="params.gongzuofenpeiDelete != null and params.gongzuofenpeiDelete != ''">
+                and a.gongzuofenpei_delete = #{params.gongzuofenpeiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断社区人员的id不为空 -->
+            <if test=" params.shequrenyuanIdNotNull != '' and params.shequrenyuanIdNotNull != null and params.shequrenyuanIdNotNull != 'null' ">
+                and a.shequrenyuan_id IS NOT NULL
+            </if>
+            <if test=" params.shequrenyuanName != '' and params.shequrenyuanName != null and params.shequrenyuanName != 'null' ">
+                and shequrenyuan.shequrenyuan_name like CONCAT('%',#{params.shequrenyuanName},'%')
+            </if>
+            <if test="params.sexTypes != null  and params.sexTypes != ''">
+                and shequrenyuan.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.shequrenyuanPhone != '' and params.shequrenyuanPhone != null and params.shequrenyuanPhone != 'null' ">
+                and shequrenyuan.shequrenyuan_phone like CONCAT('%',#{params.shequrenyuanPhone},'%')
+            </if>
+            <if test=" params.shequrenyuanEmail != '' and params.shequrenyuanEmail != null and params.shequrenyuanEmail != 'null' ">
+                and shequrenyuan.shequrenyuan_email like CONCAT('%',#{params.shequrenyuanEmail},'%')
+            </if>
+            <if test=" params.shequrenyuanAddress != '' and params.shequrenyuanAddress != null and params.shequrenyuanAddress != 'null' ">
+                and shequrenyuan.shequrenyuan_address like CONCAT('%',#{params.shequrenyuanAddress},'%')
+            </if>
+            <if test="params.shequrenyuanDeleteStart != null  and params.shequrenyuanDeleteStart != '' ">
+                <![CDATA[  and shequrenyuan.shequrenyuan_delete >= #{params.shequrenyuanDeleteStart}   ]]>
+            </if>
+            <if test="params.shequrenyuanDeleteEnd != null  and params.shequrenyuanDeleteEnd != '' ">
+                <![CDATA[  and shequrenyuan.shequrenyuan_delete <= #{params.shequrenyuanDeleteEnd}   ]]>
+            </if>
+            <if test="params.shequrenyuanDelete != null  and params.shequrenyuanDelete != '' ">
+                and shequrenyuan.shequrenyuan_delete = #{params.shequrenyuanDelete}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

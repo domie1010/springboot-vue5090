@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShequrenyuanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shequrenyuan_name as shequrenyuanName
+        ,a.sex_types as sexTypes
+        ,a.shequrenyuan_photo as shequrenyuanPhoto
+        ,a.shequrenyuan_phone as shequrenyuanPhone
+        ,a.shequrenyuan_email as shequrenyuanEmail
+        ,a.shequrenyuan_address as shequrenyuanAddress
+        ,a.shequrenyuan_delete as shequrenyuanDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShequrenyuanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM shequrenyuan  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.shequrenyuanName != '' and params.shequrenyuanName != null and params.shequrenyuanName != 'null' ">
+                and a.shequrenyuan_name like CONCAT('%',#{params.shequrenyuanName},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.shequrenyuanPhone != '' and params.shequrenyuanPhone != null and params.shequrenyuanPhone != 'null' ">
+                and a.shequrenyuan_phone like CONCAT('%',#{params.shequrenyuanPhone},'%')
+            </if>
+            <if test=" params.shequrenyuanEmail != '' and params.shequrenyuanEmail != null and params.shequrenyuanEmail != 'null' ">
+                and a.shequrenyuan_email like CONCAT('%',#{params.shequrenyuanEmail},'%')
+            </if>
+            <if test=" params.shequrenyuanAddress != '' and params.shequrenyuanAddress != null and params.shequrenyuanAddress != 'null' ">
+                and a.shequrenyuan_address like CONCAT('%',#{params.shequrenyuanAddress},'%')
+            </if>
+            <if test="params.shequrenyuanDeleteStart != null and params.shequrenyuanDeleteStart != ''">
+                <![CDATA[  and a.shequrenyuan_delete >= #{params.shequrenyuanDeleteStart}   ]]>
+            </if>
+            <if test="params.shequrenyuanDeleteEnd != null and params.shequrenyuanDeleteEnd != ''">
+                <![CDATA[  and a.shequrenyuan_delete <= #{params.shequrenyuanDeleteEnd}   ]]>
+            </if>
+             <if test="params.shequrenyuanDelete != null and params.shequrenyuanDelete != ''">
+                and a.shequrenyuan_delete = #{params.shequrenyuanDelete}
+             </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
